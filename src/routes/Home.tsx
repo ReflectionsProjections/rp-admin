@@ -33,6 +33,7 @@ import Sponsors from './pages/Sponsors';
 import Merch from './pages/Merch';
 import React from 'react';
 import EventCheckin from './pages/EventCheckin';
+import StaffAttendanceDetails from './pages/StaffAttendanceDetails';
 import Attendance from './pages/Attendance';
 
 interface JwtPayload {
@@ -226,10 +227,10 @@ export default function Home() {
             </Box>
           ) : null}
         </Box>
-
         <Box mt={16} flex="1" display="flex" flexDirection="column" minHeight='100vh'>
           {renderComponent()}
         </Box>
+        <StaffAttendanceDetails/>
       </>
     );
 }
