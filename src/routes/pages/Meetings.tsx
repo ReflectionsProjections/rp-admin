@@ -208,15 +208,21 @@ function Meetings() {
       if (!qrCodeRef.current) {
         return;
       }
+      console.log(qrCodeRef.current);
       const canvas = (
         qrCodeRef.current as unknown as {
           canvasRef: { current: HTMLCanvasElement }
         }
       ).canvasRef.current;
+      console.log(canvas);
       canvas.toBlob((blob) => {
         if (blob) {
+          console.log(blob);
           navigator.clipboard
             .write([new ClipboardItem({ "image/png": blob })])
+            .then(() => {
+              alert("Success!");
+            })
             .catch(() => {
               alert("Failed to copy QR code.");
             });
@@ -238,7 +244,7 @@ function Meetings() {
           {/*<Image src={event.imageUrl} alt={event.name} borderRadius='lg' />*/}
           {/*</Center>*/}
           <Stack mt='6' spacing='3'>
-            <Heading size='md'> {meeting.committeeType + " " + convertToCST(meeting.startTime).format("MM/DD/YYYY")}</Heading>
+            <Heading size='md'> {meeting.committeeType + " " + convertToCST(meeting.startTime).format("MM/DD")}</Heading>
             <Badge borderRadius="full" px="2" colorScheme={
               {
                 [Team.Full]: 'pink', [Team.Dev]: 'blue', [Team.Design]: 'blue',
@@ -270,7 +276,7 @@ function Meetings() {
           <ModalContent alignItems="center" onClick={onCloseQrCode}>
             <ModalHeader>Attendance: {meeting.committeeType + " " + convertToCST(meeting.startTime).format("MM/DD/YYYY")}</ModalHeader>
             <QRCode ref={qrCodeRef} logoImage={rpLogo} logoPadding={0.05} logoPaddingStyle='circle' value={meeting.meetingId}
-              size={window.innerWidth > 400 ? window.innerWidth * 0.25 : window.innerWidth * 0.9} />
+              size={window.innerWidth > 400 ? window.screen.width * 0.25 : window.innerWidth * 0.9} />
             <Flex justifyContent="center" gap="5" width="100%">
               <Button colorScheme="blue" m="5" onClick={copyQrCode}>
                 Copy
@@ -310,7 +316,7 @@ function Meetings() {
 
   // overall return! (Meetings page)
   return (
-    <Box flex="1" minW='90vw' p={4}>
+    <Box flex="1" minW='70vw' p={4}>
       <Flex justifyContent="center" alignItems="center">
         <Heading size="lg">Meetings</Heading>
       </Flex>
@@ -355,6 +361,7 @@ function Meetings() {
         </ModalContent>
       </Modal>
       <br />
+      {/* {meetings.length === 0 ? <Button leftIcon={<RepeatIcon />} colorScheme="gray" onClick={getMeetings}>Refresh</Button> : */}
       <Grid templateColumns={{ base: "repeat(1, fr)", md: "repeat(2, 1fr)", lg: "repeat(3, 1fr)" }}
         justifyItems='center' gap={6}>
         {/* accesses `meetings` object */}
