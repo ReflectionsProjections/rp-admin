@@ -108,12 +108,12 @@ export default function Home() {
         return <Stats />;
       case 'Events':
         return <Events />;
+      case 'Meetings':
+        return <Meetings />;
       // case 'Mail':
       //   return <Mail />;
       // case 'Notifications':
       //   return <Notifications />;
-      case 'Meetings':
-        return <Meetings />;
       case 'Roles':
         return <Roles />;
       case 'Sponsors':

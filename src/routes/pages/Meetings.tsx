@@ -45,6 +45,12 @@ const enum Team {
   Ops = "OPERATIONS"
 }
 
+interface Meeting {
+  meetingId: string;
+  committeeType: Team;
+  startTime: string;
+}
+
 interface JwtPayload {
   roles: string[];
 }
@@ -73,7 +79,6 @@ function Meetings() {
   const [newMeeting, setNewMeeting] = React.useState({
     committeeType: Team.Full,
     startTime: '',
-    // attendees: []
   });
 
   const createMeeting = () => {
@@ -87,7 +92,6 @@ function Meetings() {
       setNewMeeting({
         committeeType: Team.Full,
         startTime: '',
-        // attendees: []
       });
       onClose(); // Close the modal after creating the meeting
     });
@@ -103,7 +107,7 @@ function Meetings() {
     });
   }
 
-  function EditModal({ meeting }: { meeting: { meetingId: string, committeeType: Team, startTime: string } }) {
+  function EditModal({ meeting }: { meeting: Meeting }) {
     const { isOpen, onOpen, onClose } = useDisclosure();
     const [updatedValues, setUpdatedValues] = React.useState(meeting);
 
@@ -364,8 +368,8 @@ function Meetings() {
       {/* {meetings.length === 0 ? <Button leftIcon={<RepeatIcon />} colorScheme="gray" onClick={getMeetings}>Refresh</Button> : */}
       <Grid templateColumns={{ base: "repeat(1, fr)", md: "repeat(2, 1fr)", lg: "repeat(3, 1fr)" }}
         justifyItems='center' gap={6}>
-        {/* accesses `meetings` object */}
-        {meetings.map((meeting: { meetingId: string, committeeType: Team, startTime: string }) => <MeetingCard meeting={meeting} key={meeting.meetingId} />)}
+        {/* \/ accesses `meetings` object -> state dependency :)*/}
+        {meetings.sort((a: Meeting, b: Meeting) => (b.startTime.localeCompare(a.startTime))).map((meeting: { meetingId: string, committeeType: Team, startTime: string }) => <MeetingCard meeting={meeting} key={meeting.meetingId} />)}
       </Grid>
       <Button
         onClick={onOpen}
