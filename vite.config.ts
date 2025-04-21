@@ -3,5 +3,9 @@ import react from '@vitejs/plugin-react-swc';
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  server: {
+    port: 3002,
+  },
   plugins: [react()],
+  assetsInclude: ['**/*.lottie'],
 });
