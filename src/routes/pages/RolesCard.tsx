@@ -18,12 +18,13 @@ import api from '../../util/api';
 import React, { useCallback } from 'react';
 
 const TEAMS = [
-  'CONTENT', 'DEVELOPMENT', 'MARKETING', 'DESIGN', 'OPERATIONS', 'ADMIN'
+  'CONTENT', 'DEV', 'MARKETING', 'DESIGN', 'OPERATIONS', 'ADMIN'
 ];
 
 function RolesCard({ role }: { role: string }) {
   const toast = useToast();
   const [nameList, setNameList] = React.useState([]);
+  const [name, setName] = React.useState('');
   const [email, setEmail] = React.useState('');
   const [newTeam, setNewTeam] = React.useState('');
 
@@ -83,6 +84,16 @@ function RolesCard({ role }: { role: string }) {
     }
   };
 
+  const removeFromStaff = async (email: string) => {
+    const userId = generateUserId(email);
+    try {
+      await api.delete(`/staff/${userId}`);
+      console.log('Staff record removed');
+    } catch (error) {
+      console.error('Failed to remove staff record:', error);
+    }
+  };
+
   const updateUserTeam = async (name: string, newTeam: string) => {
     console.log('Update user team:', name, newTeam);
     // TODO: Connect to API
@@ -114,7 +125,10 @@ function RolesCard({ role }: { role: string }) {
           size={'md'}
           icon={ <CloseIcon /> }
           aria-label={'Open Menu'}
-          onClick={() => removeFromRole(role, name)}
+          onClick={async () => {
+            await removeFromRole(role, name);
+            await removeFromStaff(name);
+          }}
         />
       </Flex>
     ));
@@ -129,16 +143,50 @@ function RolesCard({ role }: { role: string }) {
 
       console.log('User role updated:', response.data);
       showToast(email+' User Role updated: Now '+role+' role', false);
-      getRoles();
     } catch (error) {
       console.log(error);
       showToast('Failed to update user role. Try again soon!', true);
     }
   };
 
-  const handleSubmit = () => {
-    addToRole(email); // Replace 'YOUR_ROLE_HERE' with the actual role
-    setEmail('');
+  const generateUserId = (email: string): string => {
+    return email.split('@')[0].toLowerCase();
+  };
+
+  const addToStaff = async (name: string, email: string, team: string) => {
+    const userId = generateUserId(email);
+    console.log('Adding staff:', { userId, name, team });
+    try {
+      const response = await api.post('/staff/', {
+        userId,
+        name,
+        team
+      });
+  
+      console.log('Staff added:', response.data);
+    } catch (error) {
+      console.error('Failed to add staff:', error);
+      throw error;
+    }
+  };
+
+  const handleSubmit = async () => {
+    if (!email || !name || !newTeam) {
+      showToast('Please provide name, email, and team.', true);
+      return;
+    }
+    try {
+      await addToRole(email);
+      await addToStaff(name, email, newTeam);
+      showToast(`${email} added to role and staff`, false);
+      setEmail('');
+      setName('');
+      setNewTeam('');
+      await getRoles();
+    } catch (error) {
+      console.error(error);
+      showToast('Failed to add staff member. Try again soon!', true);
+    }
   };
 
   function toTitleCase(str: string) {
@@ -157,6 +205,12 @@ function RolesCard({ role }: { role: string }) {
       </CardHeader>
       <CardBody>
         <Flex mb={4}>
+          <Input
+            placeholder="Enter name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            mr={2}
+          />
           <Input
             placeholder="Enter email"
             value={email}
