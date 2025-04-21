@@ -71,7 +71,7 @@ const NavLink = ({children, selectedLink, onClick}: {
     onClick={onClick}
     cursor="pointer"
     padding={'6px 12px'}
-    border={selectedLink ? '1px solid' : 'none'}
+    border={selectedLink ? '1px solid' : '1px solid transparent'}
     border-color={useColorModeValue('gray.700', 'gray.200')}>
     {children}
   </Link>
