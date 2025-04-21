@@ -128,13 +128,13 @@ const AttendanceBox = () => {
   }, [meetings]);
 
   const staffTeams: Record<TeamType, ParsedStaff[]> = useMemo(() => {
-    const parsedStaff = staff.map((member) => {
+    const parsedStaff = staff.filter(member => Teams.includes(member.team)).map((member) => {
       const statistics = Object.values(member.attendances).reduce((acc, type) => {
         acc[type ?? "ABSENT"]++;
         acc.TOTAL++;
         return acc;
       }, { ABSENT: 0, PRESENT: 0, EXCUSED: 0, TOTAL: 0 });
-
+      console.log(member.team, teamMeetings[member.team], statistics.TOTAL);
       if (statistics.TOTAL < teamMeetings[member.team].length) {
         const difference = teamMeetings[member.team].length - statistics.TOTAL;
         statistics.ABSENT += difference;
