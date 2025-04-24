@@ -21,19 +21,17 @@ import {
   Grid,
   CardFooter,
   Flex,
+  Skeleton,
   // Checkbox,
 } from '@chakra-ui/react';
 import { EditIcon, AddIcon } from "@chakra-ui/icons";
 import moment from 'moment-timezone';
-import axios from "axios";
-import { Config } from "../../config.ts";
+//import { Config } from "../../config.ts";
 import React, { useEffect } from "react";
-import { jwtDecode } from "jwt-decode";
+import api from '../../util/api.ts';
 import { QRCode } from "react-qrcode-logo";
 
 const readable = "MMMM Do YYYY, h:mm a";
-
-const jwt = localStorage.getItem("jwt");
 
 const enum Team {
   Content = "CONTENT",
@@ -45,27 +43,11 @@ const enum Team {
   Ops = "OPERATIONS"
 }
 
-interface Meeting {
+type Meeting = {
   meetingId: string;
   committeeType: Team;
   startTime: string;
 }
-
-interface JwtPayload {
-  roles: string[];
-}
-
-const canDelete = (): boolean => {
-  const auth = jwt !== null;
-
-  if (!auth) {
-    return false;
-  }
-
-  const decodedToken = jwtDecode(jwt) as JwtPayload;
-
-  return decodedToken.roles.includes("ADMIN");
-};
 
 function convertToCST(date: string) {
   const m = moment.utc(date);
@@ -74,7 +56,7 @@ function convertToCST(date: string) {
 }
 
 function Meetings() {
-  const [meetings, setMeetings] = React.useState([]);
+  const [meetings, setMeetings] = React.useState<Meeting[]>([]);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [newMeeting, setNewMeeting] = React.useState({
     committeeType: Team.Full,
@@ -82,12 +64,7 @@ function Meetings() {
   });
 
   const createMeeting = () => {
-    console.log("Attempting to send meeting with committeeType: " + newMeeting.committeeType + ", startTime: " + newMeeting.startTime);
-    axios.post(Config.API_BASE_URL + "/meetings", { ...newMeeting }, {
-      headers: {
-        Authorization: jwt
-      }
-    }).then(() => {
+    api.post("/meetings", { ...newMeeting }).then(() => {
       getMeetings();
       setNewMeeting({
         committeeType: Team.Full,
@@ -95,14 +72,11 @@ function Meetings() {
       });
       onClose(); // Close the modal after creating the meeting
     });
+    // Note: api util handles authorization/headers/response/etc
   };
 
   function getMeetings() {
-    axios.get(Config.API_BASE_URL + "/meetings", {
-      headers: {
-        Authorization: jwt
-      }
-    }).then(function (response) {
+    api.get("/meetings").then(function (response) {
       setMeetings(response.data);
     });
   }
@@ -122,12 +96,8 @@ function Meetings() {
       };
 
       const { meetingId, ...valuesWithoutMeetingId } = updatedValuesUTC;
-      axios.put(Config.API_BASE_URL + "/meetings/" + meetingId, {
+      api.put("/meetings/" + meetingId, {
         ...valuesWithoutMeetingId
-      }, {
-        headers: {
-          Authorization: jwt
-        }
       }).then(() => {
         getMeetings();
         onClose();
@@ -189,11 +159,7 @@ function Meetings() {
   }
 
   const deleteMeeting = (meetingId: string) => {
-    axios.delete(Config.API_BASE_URL + "/meetings/" + meetingId, {
-      headers: {
-        Authorization: jwt
-      }
-    }).then(() => {
+    api.delete("/meetings/" + meetingId).then(() => {
       getMeetings();
     });
   };
@@ -269,7 +235,7 @@ function Meetings() {
             <Button colorScheme='gray' mx="5" onClick={onOpenQrCode}>
               QR
             </Button>
-            <Button colorScheme='red' onClick={onOpenDelete} isDisabled={!canDelete()}>
+            <Button colorScheme='red' onClick={onOpenDelete}>
               Delete
             </Button>
           </Flex>
@@ -369,7 +335,12 @@ function Meetings() {
       <Grid templateColumns={{ base: "repeat(1, fr)", md: "repeat(2, 1fr)", lg: "repeat(3, 1fr)" }}
         justifyItems='center' gap={6}>
         {/* \/ accesses `meetings` object -> state dependency :)*/}
-        {meetings.sort((a: Meeting, b: Meeting) => (b.startTime.localeCompare(a.startTime))).map((meeting: { meetingId: string, committeeType: Team, startTime: string }) => <MeetingCard meeting={meeting} key={meeting.meetingId} />)}
+        {meetings && meetings.length
+          ? meetings.sort((a: Meeting, b: Meeting) => (b.startTime.localeCompare(a.startTime))).map((meeting: { meetingId: string, committeeType: Team, startTime: string }) => <MeetingCard meeting={meeting} key={meeting.meetingId} />)
+          : Array.from({ length: 8 }).map((_value, i) =>
+            <Skeleton key={i}><MeetingCard meeting={{ meetingId: "blank", committeeType: Team.Full, startTime: "blank" }} /></Skeleton>
+          )
+        }
       </Grid>
       <Button
         onClick={onOpen}
