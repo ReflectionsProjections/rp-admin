@@ -51,9 +51,7 @@ type Meeting = {
 }
 
 function convertToCST(date: string) {
-  const m = moment.utc(date);
-  m.tz('America/Chicago');
-  return m;
+  return moment.utc(date).tz('America/Chicago');
 }
 
 function Meetings() {
@@ -65,7 +63,12 @@ function Meetings() {
   });
 
   const createMeeting = () => {
-    api.post("/meetings", { ...newMeeting }).then(() => {
+    const meetingUTC = {
+      ...newMeeting,
+      startTime: moment(newMeeting.startTime).utc().format(),
+    };
+  
+    api.post("/meetings", meetingUTC).then(() => {
       getMeetings();
       setNewMeeting({
         committeeType: Team.Full,
@@ -169,7 +172,7 @@ function Meetings() {
     const { isOpen: isDeleteOpen, onOpen: onOpenDelete, onClose: onCloseDelete } = useDisclosure();
     const { isOpen: isQrCodeOpen, onOpen: onOpenQrCode, onClose: onCloseQrCode } = useDisclosure();
     const qrCodeRef = React.useRef<QRCode>(null);
-    const [qrCodeIsFullURL, setQrCodeIsFullURL] = React.useState(false);
+    const [qrCodeIsFullURL, setQrCodeIsFullURL] = React.useState(true);
 
     const confirmDelete = () => {
       deleteMeeting(meeting.meetingId);
