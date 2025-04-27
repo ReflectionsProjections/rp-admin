@@ -22,6 +22,7 @@ import {
   CardFooter,
   Flex,
   Skeleton,
+  Switch,
   // Checkbox,
 } from '@chakra-ui/react';
 import { EditIcon, AddIcon } from "@chakra-ui/icons";
@@ -168,6 +169,7 @@ function Meetings() {
     const { isOpen: isDeleteOpen, onOpen: onOpenDelete, onClose: onCloseDelete } = useDisclosure();
     const { isOpen: isQrCodeOpen, onOpen: onOpenQrCode, onClose: onCloseQrCode } = useDisclosure();
     const qrCodeRef = React.useRef<QRCode>(null);
+    const [qrCodeIsFullURL, setQrCodeIsFullURL] = React.useState(false);
 
     const confirmDelete = () => {
       deleteMeeting(meeting.meetingId);
@@ -204,7 +206,8 @@ function Meetings() {
       if (!qrCodeRef.current) {
         return;
       }
-      qrCodeRef.current.download("png", `${meeting.committeeType + " " + convertToCST(meeting.startTime).format("MM/DD/YYYY")} QR Code.png`);
+      qrCodeRef.current.download("png", `QR_${qrCodeIsFullURL ? "URL" : "APP"}_ ` +
+        `${meeting.committeeType}_${convertToCST(meeting.startTime).format("MM/DD/YYYY")}.png`);
     }
 
     return (
@@ -243,10 +246,17 @@ function Meetings() {
         {/* QR CODE MODAL */}
         <Modal isOpen={isQrCodeOpen} onClose={onCloseQrCode} isCentered>
           <ModalOverlay backdropFilter="blur(10px)" />
-          <ModalContent alignItems="center" onClick={onCloseQrCode}>
+          <ModalContent alignItems="center">
             <ModalHeader>Attendance: {meeting.committeeType + " " + convertToCST(meeting.startTime).format("MM/DD/YYYY")}</ModalHeader>
-            <QRCode ref={qrCodeRef} logoImage={rpLogo} logoPadding={0.05} logoPaddingStyle='circle' value={meeting.meetingId}
+            <QRCode ref={qrCodeRef} logoImage={rpLogo} logoPadding={0.05} logoPaddingStyle='circle'
+              value={qrCodeIsFullURL ? `admin.reflectionsprojections.org/attendance?meetingId=${meeting.meetingId}` : meeting.meetingId}
               size={window.innerWidth > 400 ? window.screen.width * 0.25 : window.innerWidth * 0.9} />
+            <Text mt="2" fontSize="small">scan with {qrCodeIsFullURL ? "camera" : "R|P app"}</Text>
+            <Flex mt="3" justifyContent="center" alignItems="center">
+              <Text position="absolute" mr="24" fontSize={!qrCodeIsFullURL ? "lg" : "unset"} fontWeight={!qrCodeIsFullURL ? "bold" : "normal"}>APP</Text>
+              <Switch alignSelf="center" defaultChecked={qrCodeIsFullURL} onChange={() => setQrCodeIsFullURL(!qrCodeIsFullURL)} />
+              <Text position="absolute" ml="24" fontSize={qrCodeIsFullURL ? "lg" : "unset"} fontWeight={qrCodeIsFullURL ? "bold" : "normal"}>URL</Text>
+            </Flex>
             <Flex justifyContent="center" gap="5" width="100%">
               <Button colorScheme="blue" m="5" onClick={copyQrCode}>
                 Copy
