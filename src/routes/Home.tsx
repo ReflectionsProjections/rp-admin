@@ -101,30 +101,30 @@ export default function Home() {
 
   const renderComponent = () => {
     switch (selectedLink) {
-      case 'Dashboard':
-        return <Dashboard name={userName} />;
-      case 'Stats':
-        return <Stats />;
-      case 'Events':
-        return <Events />;
-      case 'Meetings':
-        return <Meetings />;
+    case 'Dashboard':
+      return <Dashboard name={userName}/>;
+    case 'Stats':
+      return <Stats/>;
+    case 'Events':
+      return <Events/>;
+    case 'Meetings':
+      return <Meetings/>;
       // case 'Mail':
       //   return <Mail />;
       // case 'Notifications':
       //   return <Notifications />;
-      case 'Roles':
-        return <Roles />;
-      case 'Sponsors':
-        return <Sponsors />;
-      case 'Merch':
-        return <Merch />;
-      case 'Event Checkin':
-        return <EventCheckin />;
-      case 'Attendance':
-        return <Attendance />;
-      default:
-        return <Dashboard name={userName} />;
+    case 'Roles':
+      return <Roles/>;
+    case 'Sponsors':
+      return <Sponsors/>;
+    case 'Merch':
+      return <Merch/>;
+    case 'Event Checkin':
+      return <EventCheckin/>;
+    case 'Attendance':
+      return <Attendance/>;
+    default:
+      return <Dashboard name={userName}/>;
     }
   };
 

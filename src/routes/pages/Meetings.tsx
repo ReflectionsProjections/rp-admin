@@ -138,12 +138,6 @@ function Meetings() {
                 mb={4}
                 onChange={(e) => setUpdatedValues({ ...updatedValues, startTime: moment(e.target.value).format() })}
               />
-              {/* <Checkbox
-                isChecked={meeting.isVisible}
-                onChange={(e) => setUpdatedValues({ ...updatedValues, isVisible: e.target.checked })}
-              >
-                Is Visible
-              </Checkbox> */}
               <br />
               <Stack alignItems={'center'}>
                 <Text fontStyle={'italic'}>edit meeting attendance through Attendance page</Text>
@@ -216,9 +210,6 @@ function Meetings() {
     return (
       <Card maxWidth="sm" key={meeting.meetingId}>
         <CardBody>
-          {/*<Center>*/}
-          {/*<Image src={event.imageUrl} alt={event.name} borderRadius='lg' />*/}
-          {/*</Center>*/}
           <Stack mt='6' spacing='3'>
             <Heading size='md'> {meeting.committeeType + " " + convertToCST(meeting.startTime).format("MM/DD")}</Heading>
             <Badge borderRadius="full" px="2" colorScheme={
@@ -328,12 +319,6 @@ function Meetings() {
               onChange={(e) => setNewMeeting({ ...newMeeting, startTime: e.target.value })}
               mb={4}
             />
-            {/* <Checkbox
-              isChecked={newEvent.isVisible}
-              onChange={(e) => setNewEvent({ ...newEvent, isVisible: e.target.checked })}
-            >
-              Is Visible
-            </Checkbox> */}
           </ModalBody>
           <ModalFooter>
             <Button colorScheme="blue" mr={3} onClick={createMeeting}>
