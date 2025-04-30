@@ -139,6 +139,9 @@ function AttendanceView({attendanceData, loading}: {attendanceData: StaffAttenda
         bg: 'gray.800',
         borderColor: 'gray.500'
       }} borderColor="gray.200" borderWidth={1} borderRadius={"10px"} display="flex">
+        {attendanceData.length === 0 && (
+          <Text mt={2}>No attendance data available</Text>
+        )}
         <Box width={"170px"} minWidth={"170px"} pt={"28px"}> 
           {committeeTypes.map((committeeType, index) => (
             <Box key={`meeting-type-${index}`} fontWeight="bold" h={BOX_SIZE_PX} verticalAlign={"center"} alignItems={"center"} display="flex">
